@@ -33,5 +33,5 @@ jobs:
     - name: Build
       run: go build -v .
 
-    - name: Go Release Binary
-      uses: ngs/go-release.action@v1.0.2
+    - name: GoReleaser Action
+      uses: goreleaser/goreleaser-action@v1.3.1
