@@ -3,6 +3,8 @@
 Want to download files from a FTP server with HTTP? Here you go!
 It can also be used to upload files 🤓.
 
+![Go](https://github.com/youribonnaffe/ftp-reverse-proxy/workflows/Go/badge.svg)
+
 ## Usage:
 
 > ./ftp-reverse-proxy -port 8080 -target ftp://user:pwd@host:port
