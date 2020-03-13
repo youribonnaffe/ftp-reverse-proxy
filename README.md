@@ -43,8 +43,9 @@ _Nop, feel free to open an issue for that._
 
 - How can I proxy to multiple FTP servers?
 
-_You can run the same binary multiple times, on different ports and put an HTTP proxy in front.
+_You can run the same binary multiple times, on different ports and put an HTTP proxy in front._
 
 - Does it support HTTPS?
 
-_Nop, you can however put in behind a real proxy such as Nginx for instance that will expose it with HTTPS.
+_Nop, you can however put in behind a real proxy such as Nginx for instance that will expose it with
+HTTPS._
