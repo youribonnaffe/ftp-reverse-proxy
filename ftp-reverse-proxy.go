@@ -23,11 +23,13 @@ func main() {
 type configuration struct {
 	port   int
 	target url.URL
+	authToken string
 }
 
 func parseFlags() configuration {
 	var target = flag.String("target", "", "FTP URL to proxy to (example: ftp://user:pwd@host:21)")
 	var port = flag.Int("port", 8080, "Port to listen to")
+	var authToken = flag.String("authToken", "", "Authentication token")
 
 	flag.Usage = func() {
 		fmt.Printf("ftp-reverse-proxy, a HTTP reverse proxy to access a FTP server.\n" +
@@ -51,11 +53,26 @@ func parseFlags() configuration {
 	return configuration{
 		port:   *port,
 		target: *targetUrl,
+		authToken: *authToken,
 	}
 }
 
 func proxy(configuration configuration) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		if configuration.authToken != "" {
+			httpToken := r.Header.Get("Authorization")
+			if httpToken != "" {
+				if httpToken != configuration.authToken {
+					w.WriteHeader(http.StatusForbidden)
+					return
+				}
+			} else {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+		}
+
 		c, err := ftp.Dial(configuration.target.Host, ftp.DialWithTimeout(5*time.Second))
 		if err != nil {
 			log.Println(err)
