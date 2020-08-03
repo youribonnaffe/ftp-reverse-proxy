@@ -81,6 +81,22 @@ func proxy(configuration configuration) func(w http.ResponseWriter, r *http.Requ
 
 		} else if r.Method == "GET" {
 
+			_, ok := r.URL.Query()["ls"]
+
+			if ok {
+				fileList, err := c.NameList(r.URL.Path)
+				if err != nil {
+					log.Println(err)
+					w.WriteHeader(http.StatusNotFound)
+					return
+				}
+				for _, fileName := range fileList {
+					fmt.Fprintf(w, fileName)
+					fmt.Fprintf(w, "\n")
+				}
+				return
+			}
+
 			response, err := c.Retr(r.URL.Path)
 			if err != nil {
 				log.Println(err)
