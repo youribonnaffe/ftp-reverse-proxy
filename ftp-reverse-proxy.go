@@ -56,30 +56,21 @@ func parseFlags() configuration {
 
 func proxy(configuration configuration) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		c, err := ftp.Dial(configuration.target.Host, ftp.DialWithTimeout(5*time.Second))
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusServiceUnavailable)
-			return
-		}
-
-		password, _ := configuration.target.User.Password()
-		err = c.Login(configuration.target.User.Username(), password)
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		if r.Method == "POST" {
-			err = c.Stor(r.URL.Path, r.Body)
+		if r.Method == "GET" {
+			c, err := ftp.Dial(configuration.target.Host, ftp.DialWithTimeout(5*time.Second))
 			if err != nil {
 				log.Println(err)
-				w.WriteHeader(http.StatusInternalServerError)
+				w.WriteHeader(http.StatusServiceUnavailable)
+				return
 			}
-			log.Printf("Stored %s", r.URL.Path)
 
-		} else if r.Method == "GET" {
+			password, _ := configuration.target.User.Password()
+			err = c.Login(configuration.target.User.Username(), password)
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
 
 			response, err := c.Retr(r.URL.Path)
 			if err != nil {
