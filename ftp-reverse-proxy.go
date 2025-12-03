@@ -63,6 +63,8 @@ func proxy(configuration configuration) func(w http.ResponseWriter, r *http.Requ
 			return
 		}
 
+		defer c.Quit()
+
 		password, _ := configuration.target.User.Password()
 		err = c.Login(configuration.target.User.Username(), password)
 		if err != nil {
@@ -76,6 +78,7 @@ func proxy(configuration configuration) func(w http.ResponseWriter, r *http.Requ
 			if err != nil {
 				log.Println(err)
 				w.WriteHeader(http.StatusInternalServerError)
+				return
 			}
 			log.Printf("Stored %s", r.URL.Path)
 
@@ -87,6 +90,8 @@ func proxy(configuration configuration) func(w http.ResponseWriter, r *http.Requ
 				w.WriteHeader(http.StatusNotFound)
 				return
 			}
+
+			defer func() { if response != nil { _ = response.Close() } }()
 
 			_, err = io.Copy(w, response)
 			if err != nil {
